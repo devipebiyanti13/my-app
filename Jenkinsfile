@@ -6,6 +6,18 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
+        stage('Checkout Code') {
+            steps {
+                git url: 'https://github.com/devipebiyanti13/my-app.git', branch: 'main'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t $IMAGE_NAME ."
