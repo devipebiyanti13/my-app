@@ -1,10 +1,10 @@
 pipeline {
     agent any
     stages {
-        stage('Clone') {
+        stage('Test Git Clone') {
             steps {
-                checkout scm
-                sh 'ls -la'
+                sh 'git clone https://github.com/devipebiyanti13/my-app.git'
+                sh 'ls -la my-app'
             }
         }
     }
