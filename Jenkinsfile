@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "flask-app:latest"
+        IMAGE_NAME = "devipebiyanti/flask-app:latest"
     }
 
     stages {
@@ -12,15 +12,18 @@ pipeline {
             }
         }
 
-        stage('Load Image to Minikube') {
+        stage('Push Docker Image') {
             steps {
-                sh "minikube image load $IMAGE_NAME"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh "docker push $IMAGE_NAME"
+                }
             }
         }
 
         stage('Deploy with Helm') {
             steps {
-                sh "helm upgrade --install flask-app ./flask-chart"
+                sh "helm upgrade --install flask-app ./flask-chart --set image.repository=devipebiyanti/flask-app --set image.tag=latest"
             }
         }
     }
