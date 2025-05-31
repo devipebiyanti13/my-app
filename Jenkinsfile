@@ -2,34 +2,31 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        IMAGE_NAME = 'demo-app'
-        DOCKERHUB_USER = 'your-dockerhub-username'
+        IMAGE_NAME = "flask-app:latest"
     }
 
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/your-username/your-repo.git'
+                git 'https://github.com/devipebiyanti13/my-app.git' // ganti dengan URL git milikmu
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKERHUB_USER/$IMAGE_NAME:latest .'
+                sh "docker build -t $IMAGE_NAME ."
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Load Image to Minikube') {
             steps {
-                sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
-                sh 'docker push $DOCKERHUB_USER/$IMAGE_NAME:latest'
+                sh "minikube image load $IMAGE_NAME"
             }
         }
 
-        stage('Deploy to Minikube with Helm') {
+        stage('Deploy with Helm') {
             steps {
-                sh 'helm upgrade --install flask-release ./flask-chart --set image.repository=$DOCKERHUB_USER/$IMAGE_NAME'
+                sh "helm upgrade --install flask-app ./flask-chart" // ganti jadi ./helm kalau foldermu pakai nama 'helm'
             }
         }
     }
